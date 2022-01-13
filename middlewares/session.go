@@ -22,17 +22,21 @@ func AdminAuthSessionMiddle() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
 		sessionValue := session.Get("userId")
-		user := pojo.DBFindOneUser(sessionValue.(int))
-		if user.UserIdentity != "T" {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"message": "You not Admin.",
-			})
-			c.Abort()
-			return
-		} else {
-			c.Set("userId", sessionValue)
-			c.Next()
+		if sessionValue != nil {
+			admin := pojo.DBFindOneAdmin(sessionValue.(int))
+			if admin.AdminId == 0 {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"message": "You not Admin.",
+				})
+				c.Abort()
+				return
+			} else {
+				c.Set("userId", sessionValue)
+				c.Next()
+				return
+			}
 		}
+		c.JSON(http.StatusBadRequest, "You can't do it.")
 	}
 }
 
@@ -41,17 +45,21 @@ func UserAuthSessionMiddle() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
 		sessionValue := session.Get("userId")
-		// user := pojo.DBFindOneUser(sessionValue.(int))
-		if sessionValue == nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"message": "You not User.",
-			})
-			c.Abort()
-			return
-		} else {
-			c.Set("userId", sessionValue)
-			c.Next()
+		if sessionValue != nil {
+			user := pojo.DBFindOneUser(sessionValue.(int))
+			if user.UserId == 0 {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"message": "You not User.",
+				})
+				c.Abort()
+				return
+			} else {
+				c.Set("userId", sessionValue)
+				c.Next()
+				return
+			}
 		}
+		c.JSON(http.StatusBadRequest, "You can't do this.")
 	}
 }
 

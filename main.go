@@ -10,7 +10,7 @@ import (
 
 func main() {
 	r := gin.Default()
-	v1 := r.Group("/v1", middlewares.BasicAuth(), middlewares.EnableCookieSessions())
+	v1 := r.Group("/v1", middlewares.EnableCookieSessions())
 	src.AddUserRouter(v1)
 	src.AddProductRouter(v1)
 	src.AddBuyListRouter(v1)
